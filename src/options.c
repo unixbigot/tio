@@ -41,6 +41,7 @@ enum opt_t
     OPT_NONE,
     OPT_TIMESTAMP_FORMAT,
     OPT_LOG_FILE,
+    OPT_LOG_GRC,
     OPT_LOG_STRIP,
     OPT_LINE_PULSE_DURATION,
 };
@@ -65,6 +66,7 @@ struct option_t option =
     .no_autoconnect = false,
     .log = false,
     .log_filename = NULL,
+    .grc_rules = NULL,
     .log_strip = false,
     .local_echo = false,
     .timestamp = TIMESTAMP_NONE,
@@ -101,6 +103,7 @@ void print_help(char *argv[])
     printf("      --log-strip                        Strip control characters and escape sequences\n");
     printf("  -m, --map <flags>                      Map characters\n");
     printf("  -c, --color 0..255|bold|none|list      Colorize tio text (default: bold)\n");
+    printf("      --grc <cfg_file>                   Pipe output to the grc (GeneRic Colorizer) postprocessor\n");
     printf("  -S, --socket <socket>                  Redirect I/O to file or network socket\n");
     printf("  -x, --hexadecimal                      Enable hexadecimal mode\n");
     printf("  -v, --version                          Display version\n");
@@ -285,6 +288,7 @@ void options_parse(int argc, char *argv[])
             {"socket",              required_argument, 0, 'S'                    },
             {"map",                 required_argument, 0, 'm'                    },
             {"color",               required_argument, 0, 'c'                    },
+            {"grc",                 required_argument, 0, OPT_LOG_GRC            },
             {"hexadecimal",         no_argument,       0, 'x'                    },
             {"version",             no_argument,       0, 'v'                    },
             {"help",                no_argument,       0, 'h'                    },
@@ -372,6 +376,10 @@ void options_parse(int argc, char *argv[])
 
             case OPT_LOG_FILE:
                 option.log_filename = optarg;
+                break;
+
+            case OPT_LOG_GRC:
+                option.grc_rules = optarg;
                 break;
 
             case OPT_LOG_STRIP:

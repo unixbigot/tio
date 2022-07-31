@@ -85,6 +85,25 @@ int main(int argc, char *argv[])
         log_open(option.log_filename);
     }
 
+    /* Open a pipe to a post-processor */
+    if (option.grc_rules) {
+      int pipefd[2];
+      if (pipe(pipefd)==0) {
+	if (fork()) {
+	  // in parent, connect stdout to the pipe
+	  close(1);
+	  dup2(pipefd[1], 1);
+	}
+	else {
+	  // in child, connect stdin to the pipe
+	  close(0);
+	  dup2(pipefd[0], 0);
+	  execlp("grcat", "grcat", option.grc_rules, NULL);
+	  exit(0);
+	}
+      }
+    }
+
     /* Initialize ANSI text formatting (colors etc.) */
     print_init_ansi_formatting();
 
